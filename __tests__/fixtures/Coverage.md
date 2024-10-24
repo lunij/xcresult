@@ -87,37 +87,3 @@
 
 <h4><a name="xcresulttool-exampletests_xcresulttool_exampletests/testskip()_failure-summary"/><a href="#user-content-xcresulttool-exampletests_xcresulttool_exampletests/testskip()">xcresulttool-exampleTests/xcresulttool_exampleTests/testSkip()</a></h4>
 <table><tr><td align="right" width="100px"><b>File</b><td width="668px">/Users/katsumi/Develop/xcresulttool-example/xcresulttool-exampleTests/xcresulttool_exampleTests.swift:44<tr><td align="right" width="100px"><b>Issue Type</b><td width="668px">Assertion Failure<tr><td align="right" width="100px"><b>Message</b><td width="668px">XCTAssertEqual failed: ("success") is not equal to ("fail")</table>
-
-
----
-
-### Code Coverage
-<table>
-<tr>
-<th width="344px"></th>
-<th colspan="2">Coverage</th>
-<th width="100px">Covered</th>
-<th width="100px">Executable</th>
-</tr>
-<tr>
-<th align="left">xcresulttool-example.app</th>
-<th width="120px"><img src="https://raw.github.com/lunij/xcresult/main/images/45.svg" align="center" /></th>
-<th width="104px" align="right">45.2 %</th>
-<th align="right">14</th>
-<th align="right">31</th>
-</tr>
-<tr>
-<td><a href="xcresulttool-example/AppDelegate.swift">AppDelegate.swift</a></td>
-<td><img src="https://raw.github.com/lunij/xcresult/main/images/46.svg" align="center" /></td>
-<td align="right">46.2 %</td>
-<td align="right">6</td>
-<td align="right">13</td>
-</tr>
-<tr>
-<td><a href="xcresulttool-example/ViewController.swift">ViewController.swift</a></td>
-<td><img src="https://raw.github.com/lunij/xcresult/main/images/44.svg" align="center" /></td>
-<td align="right">44.4 %</td>
-<td align="right">8</td>
-<td align="right">18</td>
-</tr>
-</table>

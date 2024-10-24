@@ -292,6 +292,7 @@ export class Formatter {
       chapterSummary.content.push(...failuresSection)
 
       if (
+        testReport.testStatus != 'failure' &&
         testReport.codeCoverage &&
         options.showCodeCoverage &&
         testReport.creatingWorkspaceFilePath
