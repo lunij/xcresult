@@ -30,7 +30,7 @@ export class TestReport {
   codeCoverage?: CodeCoverage
   readonly annotations: Annotation[] = []
 
-  get reportSummary(): string {
+  get summary(): string {
     const lines: string[] = []
 
     if (this.buildLog) {

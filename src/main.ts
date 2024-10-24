@@ -4,6 +4,7 @@ import * as github from '@actions/github'
 import * as os from 'os'
 import * as path from 'path'
 import { Formatter } from './formatter.js'
+import { createOutput } from './output.js'
 import { uploadBundlesAsArtifacts } from './upload.js'
 import { Octokit } from '@octokit/action'
 import { promises } from 'fs'
@@ -45,8 +46,6 @@ async function run(): Promise<void> {
     })
 
     if (core.getInput('token')) {
-      await core.summary.addRaw(report.reportSummary).write()
-
       const octokit = new Octokit()
 
       const owner = github.context.repo.owner
@@ -55,31 +54,16 @@ async function run(): Promise<void> {
       const pr = github.context.payload.pull_request
       const sha = (pr && pr.head.sha) || github.context.sha
 
-      const charactersLimit = 65535
-      let title = core.getInput('title')
-      if (title.length > charactersLimit) {
-        core.warning(
-          `The 'title' will be truncated because the character limit (${charactersLimit}) exceeded.`
-        )
-        title = title.substring(0, charactersLimit)
-      }
-      let reportSummary = report.reportSummary
-      if (reportSummary.length > charactersLimit) {
-        core.warning(
-          `The 'summary' will be truncated because the character limit (${charactersLimit}) exceeded.`
-        )
-        reportSummary = reportSummary.substring(0, charactersLimit)
-      }
+      const title = core.getInput('title')
+      const summary = report.summary
+      const annotations = report.annotations
 
-      if (report.annotations.length > 50) {
-        core.warning('Annotations that exceed the limit (50) will be truncated.')
-      }
-      const annotations = report.annotations.slice(0, 50)
-      const output = {
+      const output = createOutput({
         title,
-        summary: reportSummary,
+        summary,
         annotations
-      }
+      })
+
       await octokit.checks.create({
         owner,
         repo,
@@ -90,6 +74,7 @@ async function run(): Promise<void> {
         output
       })
 
+      await core.summary.addRaw(summary).write()
       uploadBundlesAsArtifacts(inputPaths, uploadOption, report.testStatus)
     }
   } catch (error) {
