@@ -45,8 +45,6 @@ async function run(): Promise<void> {
     })
 
     if (core.getInput('token')) {
-      await core.summary.addRaw(report.reportSummary).write()
-
       const octokit = new Octokit()
 
       const owner = github.context.repo.owner
@@ -55,29 +53,30 @@ async function run(): Promise<void> {
       const pr = github.context.payload.pull_request
       const sha = (pr && pr.head.sha) || github.context.sha
 
-      const charactersLimit = 65535
+      const characterLimit = 65535
+      const annotationLimit = 50
+
       let title = core.getInput('title')
-      if (title.length > charactersLimit) {
-        core.warning(
-          `The 'title' will be truncated because the character limit (${charactersLimit}) exceeded.`
-        )
-        title = title.substring(0, charactersLimit)
-      }
-      let reportSummary = report.reportSummary
-      if (reportSummary.length > charactersLimit) {
-        core.warning(
-          `The 'summary' will be truncated because the character limit (${charactersLimit}) exceeded.`
-        )
-        reportSummary = reportSummary.substring(0, charactersLimit)
+      if (title.length > characterLimit) {
+        title = title.slice(0, characterLimit)
+        core.warning(`The title is truncated because the character limit of ${characterLimit} was exceeded.`)
       }
 
-      if (report.annotations.length > 50) {
-        core.warning('Annotations that exceed the limit (50) will be truncated.')
+      let summary = report.summary
+      if (summary.length > characterLimit) {
+        summary = summary.slice(0, characterLimit)
+        core.warning(`The summary is truncated because the character limit of ${characterLimit} was exceeded.`)
       }
-      const annotations = report.annotations.slice(0, 50)
+
+      let annotations = report.annotations
+      if (annotations.length > annotationLimit) {
+        annotations = annotations.slice(0, annotationLimit)
+        core.warning(`Annotations are truncated because the limit of ${annotationLimit} was exceeded.`)
+      }
+
       const output = {
         title,
-        summary: reportSummary,
+        summary,
         annotations
       }
       await octokit.checks.create({
@@ -90,6 +89,7 @@ async function run(): Promise<void> {
         output
       })
 
+      await core.summary.addRaw(summary).write()
       uploadBundlesAsArtifacts(inputPaths, uploadOption, report.testStatus)
     }
   } catch (error) {
