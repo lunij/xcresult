@@ -4,6 +4,7 @@ import * as github from '@actions/github'
 import * as os from 'os'
 import * as path from 'path'
 import { Formatter } from './formatter.js'
+import { createOutput } from './output.js'
 import { uploadBundlesAsArtifacts } from './upload.js'
 import { Octokit } from '@octokit/action'
 import { promises } from 'fs'
@@ -53,32 +54,16 @@ async function run(): Promise<void> {
       const pr = github.context.payload.pull_request
       const sha = (pr && pr.head.sha) || github.context.sha
 
-      const characterLimit = 65535
-      const annotationLimit = 50
+      const title = core.getInput('title')
+      const summary = report.summary
+      const annotations = report.annotations
 
-      let title = core.getInput('title')
-      if (title.length > characterLimit) {
-        title = title.slice(0, characterLimit)
-        core.warning(`The title is truncated because the character limit of ${characterLimit} was exceeded.`)
-      }
-
-      let summary = report.summary
-      if (summary.length > characterLimit) {
-        summary = summary.slice(0, characterLimit)
-        core.warning(`The summary is truncated because the character limit of ${characterLimit} was exceeded.`)
-      }
-
-      let annotations = report.annotations
-      if (annotations.length > annotationLimit) {
-        annotations = annotations.slice(0, annotationLimit)
-        core.warning(`Annotations are truncated because the limit of ${annotationLimit} was exceeded.`)
-      }
-
-      const output = {
+      const output = createOutput({
         title,
         summary,
         annotations
-      }
+      })
+
       await octokit.checks.create({
         owner,
         repo,
