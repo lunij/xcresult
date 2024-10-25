@@ -74,7 +74,7 @@ async function run(): Promise<void> {
         output
       })
 
-      await core.summary.addRaw(summary).write()
+      await core.summary.addRaw(output.summary).write()
       uploadBundlesAsArtifacts(inputPaths, uploadOption, report.testStatus)
     }
   } catch (error) {

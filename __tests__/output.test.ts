@@ -1,11 +1,14 @@
 import { describe, expect, it, jest } from '@jest/globals'
 import { createOutput } from '../src/output.js'
 import { Annotation } from '../src/report.js'
-import * as core from '@actions/core'
 
 jest.mock('@actions/core', () => ({
   warning: jest.fn()
 }))
+
+function byteSize(str: string): number {
+  return new TextEncoder().encode(str).length
+}
 
 describe('createOutput', () => {
   it('should truncate title and summary if they exceed character limit', () => {
@@ -17,6 +20,17 @@ describe('createOutput', () => {
 
     expect(result.title.length).toBe(65535)
     expect(result.summary.length).toBe(65535)
+  })
+
+  it('should truncate title and summary to byte limit if they exceed byte limit', () => {
+    const result = createOutput({
+      title: '🚀' + 'a'.repeat(65534),
+      summary: '🚀' + 'b'.repeat(65534),
+      annotations: []
+    })
+
+    expect(byteSize(result.title)).toBe(65535)
+    expect(byteSize(result.summary)).toBe(65535)
   })
 
   it('should truncate annotations if they exceed annotation limit', () => {
