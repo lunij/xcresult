@@ -282,4 +282,23 @@ describe('XCResultTool', () => {
       })
     })
   })
+
+  describe('merge', () => {
+    it('should merge multiple xcresults into a single one', async () => {
+      const mockExec = exec as jest.MockedFunction<typeof exec>
+
+      mockExec.mockResolvedValueOnce(0)
+
+      const inputPaths = ['path1.xcresult', 'path2.xcresult']
+      const outputPath = 'mergedOutput.xcresult'
+
+      await XCResultTool.merge(inputPaths, outputPath)
+
+      expect(mockExec).toHaveBeenCalledWith(
+        'xcrun',
+        ['xcresulttool', 'merge', ...inputPaths, '--output-path', outputPath],
+        { silent: true }
+      )
+    })
+  })
 })

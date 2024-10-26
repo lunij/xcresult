@@ -1,11 +1,11 @@
 import * as core from '@actions/core'
-import * as exec from '@actions/exec'
 import * as github from '@actions/github'
 import * as os from 'os'
 import * as path from 'path'
 import { Formatter } from './formatter.js'
 import { createOutput } from './output.js'
 import { uploadBundlesAsArtifacts } from './upload.js'
+import { XCResultTool } from './xcresulttool.js'
 import { Octokit } from '@octokit/action'
 import { promises } from 'fs'
 const { stat } = promises
@@ -20,17 +20,17 @@ async function run(): Promise<void> {
     const uploadOption = core.getInput('upload').toLowerCase()
 
     const bundlePaths: string[] = []
-    for (const checkPath of inputPaths) {
+    for (const inputPath of inputPaths) {
       try {
-        await stat(checkPath)
-        bundlePaths.push(checkPath)
+        await stat(inputPath)
+        bundlePaths.push(inputPath)
       } catch (error) {
         core.error((error as Error).message)
       }
     }
     let bundlePath = path.join(os.tmpdir(), 'Merged.xcresult')
     if (inputPaths.length > 1) {
-      await mergeResultBundle(bundlePaths, bundlePath)
+      await XCResultTool.merge(bundlePaths, bundlePath)
     } else {
       const inputPath = inputPaths[0]
       await stat(inputPath)
@@ -83,12 +83,3 @@ async function run(): Promise<void> {
 }
 
 run()
-
-async function mergeResultBundle(inputPaths: string[], outputPath: string): Promise<void> {
-  const args = ['xcresulttool', 'merge'].concat(inputPaths).concat(['--output-path', outputPath])
-  const options = {
-    silent: true
-  }
-
-  await exec.exec('xcrun', args, options)
-}

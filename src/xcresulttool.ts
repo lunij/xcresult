@@ -91,4 +91,12 @@ export class XCResultTool {
       throw new Error(`The command "${command}" failed with error: ${(error as Error).message}`)
     }
   }
+
+  static async merge(inputPaths: string[], outputPath: string): Promise<void> {
+    const args = ['xcresulttool', 'merge'].concat(inputPaths).concat(['--output-path', outputPath])
+    const options = {
+      silent: true
+    }
+    await exec('xcrun', args, options)
+  }
 }
